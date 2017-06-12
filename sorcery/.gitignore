@@ -11,19 +11,29 @@
 .byebug_history
 
 # Ignore less relevant directories
-/app/assets
-/app/helpers
-/bin
+/*
+
+!/app
+/app/*
+!/app/controllers
+!/app/models
+!/app/views
+
+!/config
 /config/*
+!/config/initializers
+/config/initializers/*
+!/config/initializers/sorcery.rb
 !/config/application.rb
 !/config/database.yml
 !/config/routes.rb
 !/config/secrets.yml
-/lib
-/log
-/tmp
-/vendor
-config.ru
+
+!/db
+/db/*
+!/db/migrate
+!/db/schema.rb
+
 
 # Ignore vendor/bundle
 /vendor/bundle

@@ -14,6 +14,7 @@ html
       - else
         => link_to 'Register', new_user_path
         => link_to 'Login', :login
+        => link_to 'Login with Facebook', auth_at_provider_path(provider: :facebook)
     div
       p#notice= flash[:notice]
       p#alert= flash[:alert]

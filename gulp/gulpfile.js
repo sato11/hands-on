@@ -1,10 +1,11 @@
-var gulp = require('gulp');
-var sass = require('gulp-sass');
-var autoprefixer = require('gulp-autoprefixer');
-var frontnote = require('gulp-frontnote');
-var uglify = require('gulp-uglify');
-var browser = require('browser-sync');
-var plumber = require('gulp-plumber');
+const gulp = require('gulp');
+
+const autoprefixer = require('gulp-autoprefixer');
+const browser      = require('browser-sync');
+const frontnote    = require('gulp-frontnote');
+const plumber      = require('gulp-plumber');
+const sass         = require('gulp-sass');
+const uglify       = require('gulp-uglify');
 
 gulp.task('server', function() {
     browser({

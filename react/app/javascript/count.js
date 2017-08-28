@@ -59,22 +59,20 @@ const TextAreaCounter = createReactClass({
   },
 
   render: function() {
-    console.log(`${this.name}::render()`);
     let count = null;
     if (this.state.text.length > 0) {
-      count = React.DOM.h3(null,
-        React.createElement(Counter, {
-          count: this.state.text.length,
-        })
+      count = (
+        <h3>
+          <Counter count={ this.state.text.length }></Counter>
+        </h3>
       );
     }
-    return React.DOM.div(null,
-      React.DOM.textarea({
-        value: this.state.text,
-        onChange: this._textChange,
-      }),
-      count
-    );
+    return (
+      <div>
+        <textarea value={ this.state.text } onChange={ this._textChange }></textarea>
+        { count }
+      </div>
+    )
   },
 });
 
@@ -90,14 +88,13 @@ const Counter = createReactClass({
   },
 
   render: function() {
-    console.log(`${this.name}::render()`);
-    return React.DOM.span(null, this.props.count);
+    return (
+      <span>{ this.props.count }</span>
+    );
   },
 });
 
 const myTextAreaCounter = ReactDOM.render(
-  React.createElement(TextAreaCounter, {
-    defaultValue: 'Bob',
-  }),
+  <TextAreaCounter defaultValue={ 'Bob' }></TextAreaCounter>,
   document.getElementById('app')
 );

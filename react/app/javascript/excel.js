@@ -137,83 +137,79 @@ const Excel = React.createClass({
 
   render: function() {
     return (
-      React.DOM.div(null,
-        this._renderToolbar(),
-        this._renderTable(),
-      )
+      <div>
+        { this._renderToolbar() }
+        { this._renderTable() }
+      </div>
     );
   },
 
   _renderToolbar: function() {
-    return React.DOM.button({
-      onClick: this._toggleSearch,
-      className: 'toolbar',
-    },
-    '検索'
+    return (
+      <button onClick={ this._toggleSearch } className="toolbar">検索</button>
     );
   },
 
   _renderTable: function() {
     return (
-      React.DOM.table(null,
-        React.DOM.thead({ onClick: this._sort },
-          React.DOM.tr(null,
-            this.props.headers.map( (title, i) => {
+      <table>
+        <thead onClick={ this._sort }>
+          <tr>
+            { this.props.headers.map( (title, i) => {
               if (this.state.sortby == i) {
                 title += this.state.descending ? ' \u2191' : '\u2193'
               }
-              return React.DOM.th({ key: i }, title)
-            }, this)
-          )
-        ),
-        React.DOM.tbody({ onDoubleClick: this._showEditor },
+              return (
+                <th key={ i }>{ title }</th>
+              )
+            }, this)}
+          </tr>
+        </thead>
+        <tbody onDoubleClick={ this._showEditor }>{
           this._renderSearch(),
           this.state.data.map( (row, rowId) => {
-            return React.DOM.tr({ key: rowId },
-              row.map( (cell, i) => {
-                let content = cell;
-                const edit = this.state.edit;
-                if (edit && edit.row === rowId && edit.cell === i) {
-                  content = React.DOM.form({ onSubmit: this._save },
-                    React.DOM.input({
-                      type: 'text',
-                      defaultValue: content,
-                    })
-                  );
-                }
-                return React.DOM.td({
-                  key: i,
-                  'data-row': rowId,
-                }, content);
-              }, this)
+            return (
+              <tr key={ rowId }>
+                { row.map( (cell, i) => {
+                  let content = cell;
+                  const edit = this.state.edit;
+                  if (edit && edit.row === rowId && edit.cell === i) {
+                    content =
+                      <form onSubmit={ this._save }>
+                        <input type="text" defaultValue={ content } />
+                      </form>
+                  }
+                  return (
+                    <td key={ i } data-row={ rowId }>
+                      { content }
+                    </td>
+                  )
+                }, this)}
+              </tr>
             )
-          }, this)
-        )
-      )
-    );
+          }, this)}
+        </tbody>
+      </table>
+    )
   },
 
   _renderSearch: function() {
     if (!this.state.search) { return null; }
     return (
-      React.DOM.tr({ onChange: this._search },
-        this.props.headers.map((_ignore, id) => {
-          return React.DOM.td({ key: id },
-            React.DOM.input({
-              type: 'text',
-              'data-id': id,
-            })
+      <tr onChange={ this._search }>
+        { this.props.headers.map((_ignore, id) => {
+          return (
+            <td key={ id }>
+              <input type="text" data-id={ id } />
+            </td>
           );
-        })
-      )
+        })}
+      </tr>
     )
   },
 });
 
 ReactDOM.render(
-  React.createElement(Excel, {
-    headers: headers,
-    initialData: data,
-  }),
+  <Excel headers={ headers } initialData={ data }></Excel>,
   document.getElementById('app')
 );

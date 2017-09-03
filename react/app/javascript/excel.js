@@ -190,9 +190,9 @@ const Excel = React.createClass({
             }, this)}
           </tr>
         </thead>
-        <tbody onDoubleClick={ this._showEditor }>{
-          this._renderSearch(),
-          this.state.data.map( (row, rowId) => {
+        <tbody onDoubleClick={ this._showEditor }>
+          { this._renderSearch() }
+          { this.state.data.map( (row, rowId) => {
             return (
               <tr key={ rowId }>
                 { row.map( (cell, i) => {
@@ -238,3 +238,5 @@ ReactDOM.render(
   <Excel headers={ headers } initialData={ data }></Excel>,
   document.getElementById('app')
 );
+
+export default Excel

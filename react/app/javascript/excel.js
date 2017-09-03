@@ -158,7 +158,7 @@ const Excel = React.createClass({
 
   render: function() {
     return (
-      <div>
+      <div className="Excel">
         { this._renderToolbar() }
         { this._renderTable() }
       </div>
@@ -233,10 +233,5 @@ const Excel = React.createClass({
     )
   },
 });
-
-ReactDOM.render(
-  <Excel headers={ headers } initialData={ data }></Excel>,
-  document.getElementById('app')
-);
 
 export default Excel

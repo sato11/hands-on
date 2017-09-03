@@ -135,6 +135,27 @@ const Excel = React.createClass({
     this._logSetState({ data: searchData });
   },
 
+  download: function(format, ev) {
+    const contents = format === 'json'
+      ? JSON.stringify(this.state.data)
+      : this.state.data.reduce((result, row) => {
+        return result
+          + row.reduce((rowResult, cell, id) => {
+            return rowResult
+              + '"'
+              + cell.replace(/"/g, '""')
+              + '"'
+              + (id < row.length - 1 ? ',' : '');
+          }, '')
+          + "\n";
+      }, '');
+
+    const URL = window.URL || window.webkitURL;
+    const blob = new Blob([contents], { type: `text/${format}` });
+    ev.target.href = URL.createObjectURL(blob);
+    ev.target.download = `data.${format}`
+  },
+
   render: function() {
     return (
       <div>
@@ -146,7 +167,11 @@ const Excel = React.createClass({
 
   _renderToolbar: function() {
     return (
-      <button onClick={ this._toggleSearch } className="toolbar">検索</button>
+      <div className="toolbar">
+        <button onClick={ this._toggleSearch }>検索</button>
+        <a onClick={ this.download.bind(this, 'json') } href="data.json">JSONで保存</a>
+        <a onClick={ this.download.bind(this, 'csv') } href="data.csv">CSVで保存</a>
+      </div>
     );
   },
 

@@ -1,8 +1,6 @@
 import classNames from 'classnames';
 import React, { Component, PropTypes } from 'react';
 
-import style from './../styles/rating';
-
 class Rating extends React.Component {
   constructor(props) {
     super(props);

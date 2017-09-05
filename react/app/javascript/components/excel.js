@@ -2,8 +2,6 @@ import React            from 'react';
 import ReactDOM         from 'react-dom';
 import createReactClass from 'create-react-class';
 
-import style            from './../styles/excel';
-
 const headers = [
   'Title', 'Author', 'Language', 'Published', 'Sales'
 ];

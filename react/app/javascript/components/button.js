@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import classNames from 'classnames';
-import style from '../styles/button';
 
 const Button = props => {
   const cssclasses = classNames('Button', props.className);

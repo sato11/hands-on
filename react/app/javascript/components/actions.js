@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import style from './../styles/actions';
 
 const Actions = props =>
   <div className="Actions">

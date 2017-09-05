@@ -1,4 +1,4 @@
 Rails.application.routes.draw do
-  resource :discover, only: %i(show)
+  resources :components, only: %i(index)
   root 'home#index'
 end

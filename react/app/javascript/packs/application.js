@@ -9,8 +9,6 @@
 
 import Excel    from './../components/excel';
 import Logo     from './../components/logo';
-import Button   from './../components/button';
-import Rating   from './../components/rating';
 
 import React    from 'react';
 import ReactDON from 'react-dom';

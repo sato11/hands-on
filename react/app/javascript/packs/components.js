@@ -6,6 +6,7 @@ import Suggest   from './../components/suggest';
 import Rating    from './../components/rating';
 import FormInput from './../components/formInput';
 import Form      from './../components/form';
+import Actions   from './../components/actions';
 import React     from 'react';
 import ReactDOM  from 'react-dom';
 
@@ -73,6 +74,9 @@ ReactDOM.render(
         { label: 'greeting', id: 'freetext' }
       ]}
       initialData={ { rateme: 4, freetext: 'こんにちは' } } />
+
+    <h2>Actions</h2>
+    <div><Actions onAction={ type => alert(type) } /></div>
   </div>,
   document.getElementById('pad')
 );

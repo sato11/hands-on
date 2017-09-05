@@ -1,11 +1,12 @@
 'use strict';
 
-import Logo     from './../components/logo';
-import Button   from './../components/button';
-import Suggest  from './../components/suggest';
-import Rating   from './../components/rating';
-import React    from 'react';
-import ReactDOM from 'react-dom';
+import Logo      from './../components/logo';
+import Button    from './../components/button';
+import Suggest   from './../components/suggest';
+import Rating    from './../components/rating';
+import FormInput from './../components/formInput'
+import React     from 'react';
+import ReactDOM  from 'react-dom';
 
 ReactDOM.render(
   <div style={ { padding: '20px' } }>
@@ -29,6 +30,40 @@ ReactDOM.render(
     <div>4<Rating defaultValue={ 4 } /></div>
     <div>max: 11<Rating max={ 11 } /></div>
     <div>Read only<Rating readonly={ true } defaultValue={ 3 } /></div>
+
+    <h2>FormInput</h2>
+    <table>
+      <tbody>
+        <tr>
+          <td>Simple input</td>
+          <td><FormInput /></td>
+        </tr>
+        <tr>
+          <td>Default value</td>
+          <td><FormInput defaultValue="This is default" /></td>
+        </tr>
+        <tr>
+          <td>Year input</td>
+          <td><FormInput type="year" /></td>
+        </tr>
+        <tr>
+          <td>Rating</td>
+          <td><FormInput type="rating" defaultValue={ 4 } /></td>
+        </tr>
+        <tr>
+          <td>Suggest</td>
+          <td><FormInput
+            type="suggest"
+            options={ ['red', 'green', 'bkue'] }
+            defaultValue="green" />
+          </td>
+        </tr>
+        <tr>
+          <td>Simple textarea</td>
+          <td><FormInput type="text" /></td>
+        </tr>
+      </tbody>
+    </table>
   </div>,
   document.getElementById('pad')
 );

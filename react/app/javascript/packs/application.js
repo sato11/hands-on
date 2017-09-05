@@ -7,7 +7,8 @@
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
 
-import Excel    from './../excel';
+import Excel    from './../components/excel';
+import Logo     from './../components/logo';
 
 import React    from 'react';
 import ReactDON from 'react-dom';
@@ -22,7 +23,9 @@ if (!headers) {
 
 ReactDON.render(
   <div>
-    <h1>Welcome to Whinepad!</h1>
+    <h1>
+      <Logo />Welcome to Whinepad!
+    </h1>
     <Excel headers={ headers } initialData={ data } />
   </div>,
   document.getElementById('app')

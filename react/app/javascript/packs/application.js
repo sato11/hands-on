@@ -28,5 +28,5 @@ ReactDON.render(
     </h1>
     <Excel headers={ headers } initialData={ data } />
   </div>,
-  document.getElementById('app')
+  document.getElementById('pad')
 )

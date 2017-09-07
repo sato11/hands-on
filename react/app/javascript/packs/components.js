@@ -7,6 +7,7 @@ import Rating    from './../components/rating';
 import FormInput from './../components/formInput';
 import Form      from './../components/form';
 import Actions   from './../components/actions';
+import Dialog    from './../components/dialog'
 
 import React     from 'react';
 import ReactDOM  from 'react-dom';
@@ -78,6 +79,23 @@ ReactDOM.render(
 
     <h2>Actions</h2>
     <div><Actions onAction={ type => alert(type) } /></div>
+
+    <h2>Dialog</h2>
+    <div>
+      <Dialog
+        header="Simple dialog"
+        onAction={ type => alert(type) }>
+        Hello!
+      </Dialog>
+
+      <Dialog
+        header="Custom button without cancel"
+        hasCancel={ false }
+        confirmLabel="Label"
+        onAction={ type => alert(type) }>
+        Dialog can display anything, like <Button>Button</Button>
+      </Dialog>
+    </div>
   </div>,
   document.getElementById('pad')
 );

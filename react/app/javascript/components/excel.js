@@ -1,237 +1,246 @@
-import React            from 'react';
-import ReactDOM         from 'react-dom';
-import createReactClass from 'create-react-class';
+import Actions from './Actions';
+import Dialog from './Dialog';
+import Form from './Form';
+import FormInput from './FormInput';
+import Rating from './Rating';
+import React, {Component, PropTypes} from 'react';
+import classNames from 'classnames';
 
-const headers = [
-  'Title', 'Author', 'Language', 'Published', 'Sales'
-];
+class Excel extends Component {
 
-const data = [
-  ["The Lord of the Rings", "J. R. R. Tolkien", "English", "1954–1955", "150 million"],
-  ["Le Petit Prince (The Little Prince)", "Antoine de Saint-Exupéry", "French", "1943", "140 million"],
-  ["Harry Potter and the Philosopher's Stone", "J. K. Rowling", "English", "1997", "107 million"],
-  ["And Then There Were None", "Agatha Christie", "English", "1939", "100 million"],
-  ["Dream of the Red Chamber", "Cao Xueqin", "Chinese", "1754–1791", "100 million"],
-  ["The Hobbit", "J. R. R. Tolkien", "English", "1937", "100 million"],
-  ["She: A History of Adventure", "H. Rider Haggard", "English", "1887", "100 million"],
-];
-
-const Excel = React.createClass({
-  displayName: 'Excel',
-  propTypes: {
-    headers: React.PropTypes.arrayOf(
-      React.PropTypes.string
-    ),
-    initialData: React.PropTypes.arrayOf(
-      React.PropTypes.arrayOf(
-        React.PropTypes.string
-      )
-    ),
-  },
-  _preSearchData: null,
-  _log: [],
-
-  _logSetState: function(newState) {
-    this._log.push(JSON.parse(JSON.stringify(
-      this._log.length === 0 ? this.state : newState
-    )));
-    this.setState(newState);
-  },
-
-  componentDidMount: function() {
-    document.onkeydown = function(e) {
-      if (e.altKey && e.shiftKey && e.keyCode === 82) {
-        this._replay();
-      }
-    }.bind(this);
-  },
-
-  _replay: function() {
-    if (this._log.length === 0) {
-      console.warn('No state is logged.');
-      return;
-    }
-    let id = -1;
-    const interval = setInterval(function() {
-      id++;
-      if (id === this._log.length - 1) {
-        clearInterval(interval);
-      }
-      this.setState(this._log[id]);
-    }.bind(this), 1000);
-  },
-
-  getInitialState: function() {
-    return {
+  constructor(props) {
+    super(props);
+    this.state = {
       data: this.props.initialData,
-      sortby: null,
+      sortby: null, // schema.id
       descending: false,
-      edit: null,
-      search: false,
+      edit: null, // [row index, schema.id],
+      dialog: null, // {type, idx}
     };
-  },
+  }
 
-  _sort: function(e) {
-    const column = e.target.cellIndex;
-    const descending = this.state.sortby === column && !this.state.descending
-    const data = this.state.data.slice();
-    data.sort( (a, b) => {
-      return descending
-        ? (a[column] < b[column] ? 1 : -1)
-        : (a[column] > b[column] ? 1 : -1);
-    });
-    this._logSetState({
+  componentWillReceiveProps(nextProps) {
+    this.setState({data: nextProps.initialData});
+  }
+
+  _fireDataChange(data) {
+    this.props.onDataChange(data);
+  }
+
+  _sort(key) {
+    let data = Array.from(this.state.data);
+    const descending = this.state.sortby === key && !this.state.descending;
+    data.sort((a, b) =>
+      descending
+        ? (a[key] < b[key] ? 1 : -1)
+        : (a[key] > b[key] ? 1 : -1)
+    );
+    this.setState({
       data: data,
-      sortby: column,
+      sortby: key,
       descending: descending,
     });
-  },
+    this._fireDataChange(data);
+  }
 
-  _showEditor: function(e) {
-    this._logSetState({
-      edit: {
-        row: parseInt(e.target.dataset.row, 10),
-        cell: e.target.cellIndex,
-      }
-    });
-  },
+  _showEditor(e) {
+    this.setState({edit: {
+      row: parseInt(e.target.dataset.row, 10),
+      key: e.target.dataset.key,
+    }});
+  }
 
-  _save: function(e) {
+  _save(e) {
     e.preventDefault();
-    const input = e.target.firstChild;
-    const data = this.state.data.slice();
-    data[this.state.edit.row][this.state.edit.cell] = input.value;
-    this._logSetState({
+    const value = this.refs.input.getValue();
+    let data = Array.from(this.state.data);
+    data[this.state.edit.row][this.state.edit.key] = value;
+    this.setState({
       edit: null,
       data: data,
-    })
-  },
+    });
+    this._fireDataChange(data);
+  }
 
-  _toggleSearch: function() {
-    if (this.state.search) {
-      this._logSetState({
-        data: this._preSearchData,
-        search: false,
-      });
-      this._preSearchData = null;
-    } else {
-      this._preSearchData = this.state.data;
-      this._logSetState({
-        search: true,
-      });
-    }
-  },
+  _actionClick(rowidx, action) {
+    this.setState({dialog: {type: action, idx: rowidx}});
+  }
 
-  _search: function(e) {
-    const needle = e.target.value.toLowerCase();
-    if (!needle) {
-      this._logSetState({ data: this._preSearchData });
+  _deleteConfirmationClick(action) {
+    if (action === 'dismiss') {
+      this._closeDialog();
       return;
     }
-    const id = e.target.dataset.id;
-    const searchData = this._preSearchData.filter( row => {
-      return row[id].toString().toLowerCase().indexOf(needle) > -1;
+    let data = Array.from(this.state.data);
+    data.splice(this.state.dialog.idx, 1);
+    this.setState({
+      dialog: null,
+      data: data,
     });
-    this._logSetState({ data: searchData });
-  },
+    this._fireDataChange(data);
+  }
 
-  download: function(format, ev) {
-    const contents = format === 'json'
-      ? JSON.stringify(this.state.data)
-      : this.state.data.reduce((result, row) => {
-        return result
-          + row.reduce((rowResult, cell, id) => {
-            return rowResult
-              + '"'
-              + cell.replace(/"/g, '""')
-              + '"'
-              + (id < row.length - 1 ? ',' : '');
-          }, '')
-          + "\n";
-      }, '');
+  _closeDialog() {
+    this.setState({dialog: null});
+  }
 
-    const URL = window.URL || window.webkitURL;
-    const blob = new Blob([contents], { type: `text/${format}` });
-    ev.target.href = URL.createObjectURL(blob);
-    ev.target.download = `data.${format}`
-  },
+  _saveDataDialog(action) {
+    if (action === 'dismiss') {
+      this._closeDialog();
+      return;
+    }
+    let data = Array.from(this.state.data);
+    data[this.state.dialog.idx] = this.refs.form.getData();
+    this.setState({
+      dialog: null,
+      data: data,
+    });
+    this._fireDataChange(data);
+  }
 
-  render: function() {
+  render() {
     return (
       <div className="Excel">
-        { this._renderToolbar() }
-        { this._renderTable() }
+        {this._renderTable()}
+        {this._renderDialog()}
       </div>
     );
-  },
+  }
 
-  _renderToolbar: function() {
+  _renderDialog() {
+    if (!this.state.dialog) {
+      return null;
+    }
+    switch (this.state.dialog.type) {
+      case 'delete':
+        return this._renderDeleteDialog();
+      case 'info':
+        return this._renderFormDialog(true);
+      case 'edit':
+
+                return this._renderFormDialog();
+      default:
+        throw Error(`Unexpected dialog type ${this.state.dialog.type}`);
+    }
+  }
+
+  _renderDeleteDialog() {
+    const first = this.state.data[this.state.dialog.idx];
+    const nameguess = first[Object.keys(first)[0]];
     return (
-      <div className="toolbar">
-        <button onClick={ this._toggleSearch }>検索</button>
-        <a onClick={ this.download.bind(this, 'json') } href="data.json">JSONで保存</a>
-        <a onClick={ this.download.bind(this, 'csv') } href="data.csv">CSVで保存</a>
-      </div>
+      <Dialog
+        modal={true}
+        header="Confirm deletion"
+        confirmLabel="Delete"
+        onAction={this._deleteConfirmationClick.bind(this)}
+      >
+        {`Are you sure you want to delete "${nameguess}"?`}
+      </Dialog>
     );
-  },
+  }
 
-  _renderTable: function() {
+  _renderFormDialog(readonly) {
+    return (
+      <Dialog
+        modal={true}
+        header={readonly ? 'Item info' : 'Edit item'}
+        confirmLabel={readonly ? 'ok' : 'Save'}
+        hasCancel={!readonly}
+        onAction={this._saveDataDialog.bind(this)}
+      >
+        <Form
+          ref="form"
+          fields={this.props.schema}
+          initialData={this.state.data[this.state.dialog.idx]}
+          readonly={readonly} />
+      </Dialog>
+    );
+  }
+
+  _renderTable() {
     return (
       <table>
-        <thead onClick={ this._sort }>
-          <tr>
-            { this.props.headers.map( (title, i) => {
-              if (this.state.sortby == i) {
-                title += this.state.descending ? ' \u2191' : '\u2193'
+        <thead>
+          <tr>{
+            this.props.schema.map(item => {
+              if (!item.show) {
+                return null;
+              }
+              let title = item.label;
+              if (this.state.sortby === item.id) {
+                title += this.state.descending ? ' \u2191' : ' \u2193';
               }
               return (
-                <th key={ i }>{ title }</th>
-              )
-            }, this)}
+                <th
+                  className={`schema-${item.id}`}
+                  key={item.id}
+                  onClick={this._sort.bind(this, item.id)}
+                >
+                  {title}
+                </th>
+              );
+            }, this)
+          }
+          <th className="ExcelNotSortable">Actions</th>
           </tr>
         </thead>
-        <tbody onDoubleClick={ this._showEditor }>
-          { this._renderSearch() }
-          { this.state.data.map( (row, rowId) => {
+        <tbody onDoubleClick={this._showEditor.bind(this)}>
+          {this.state.data.map((row, rowidx) => {
             return (
-              <tr key={ rowId }>
-                { row.map( (cell, i) => {
-                  let content = cell;
+              <tr key={rowidx}>{
+                Object.keys(row).map((cell, idx) => {
+                  const schema = this.props.schema[idx];
+                  if (!schema || !schema.show) {
+                    return null;
+                  }
+                  const isRating = schema.type === 'rating';
                   const edit = this.state.edit;
-                  if (edit && edit.row === rowId && edit.cell === i) {
-                    content =
-                      <form onSubmit={ this._save }>
-                        <input type="text" defaultValue={ content } />
+                  let content = row[cell];
+                  if (!isRating && edit && edit.row === rowidx && edit.key === schema.id) {
+                    content = (
+                      <form onSubmit={this._save.bind(this)}>
+                        <FormInput ref="input" {...schema} defaultValue={content} />
                       </form>
+                    );
+                  } else if (isRating) {
+                    content = <Rating readonly={true} defaultValue={Number(content)} />;
                   }
                   return (
-                    <td key={ i } data-row={ rowId }>
-                      { content }
+                    <td
+                      className={classNames({
+                        [`schema-${schema.id}`]: true,
+                        'ExcelEditable': !isRating,
+                        'ExcelDataLeft': schema.align === 'left',
+                        'ExcelDataRight': schema.align === 'right',
+                        'ExcelDataCenter': schema.align !== 'left' && schema.align !== 'right',
+                      })}
+                      key={idx}
+                      data-row={rowidx}
+                      data-key={schema.id}>
+                      {content}
                     </td>
-                  )
+                  );
                 }, this)}
+                <td className="ExcelDataCenter">
+                  <Actions onAction={this._actionClick.bind(this, rowidx)}/>
+                </td>
               </tr>
-            )
+            );
           }, this)}
         </tbody>
       </table>
-    )
-  },
+    );
+  }
+}
 
-  _renderSearch: function() {
-    if (!this.state.search) { return null; }
-    return (
-      <tr onChange={ this._search }>
-        { this.props.headers.map((_ignore, id) => {
-          return (
-            <td key={ id }>
-              <input type="text" data-id={ id } />
-            </td>
-          );
-        })}
-      </tr>
-    )
-  },
-});
+Excel.propTypes = {
+  schema: PropTypes.arrayOf(
+    PropTypes.object
+  ),
+  initialData: PropTypes.arrayOf(
+    PropTypes.object
+  ),
+  onDataChange: PropTypes.func,
+};
 
 export default Excel

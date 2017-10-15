@@ -1,24 +1,8 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## ActiveAdminDemo
+Hands-on practice for ActiveAdmin.  
+[Active Admin | The administration framework for Ruby on Rails](https://activeadmin.info/index.html)
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Sample code follows this video.  
+[Rails Admin Interfaces with ActiveAdmin (YouTube)](https://www.youtube.com/watch?v=NJYtzznKrg0) by GoRails.

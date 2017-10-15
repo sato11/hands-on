@@ -1,6 +1,10 @@
 ActiveAdmin.register Post do
   permit_params :title, :body, :published_at, :user_id
 
+  scope :all
+  scope :published
+  scope :unpublished
+
   action_item :publish, only: :show do
     link_to 'Publish', publish_admin_post_path(post), method: :put if !post.published_at?
   end

@@ -5,6 +5,15 @@ ActiveAdmin.register Post do
   scope :published
   scope :unpublished
 
+  form do |f|
+    inputs 'Details' do
+      input :user
+      input :title
+      input :body
+    end
+    actions
+  end
+
   action_item :publish, only: :show do
     link_to 'Publish', publish_admin_post_path(post), method: :put if !post.published_at?
   end

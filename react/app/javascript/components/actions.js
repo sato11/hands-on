@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-const Actions = props =>
+const Actions = (props) =>
   <div className="Actions">
     <span
       tabIndex="0"
